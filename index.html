@@ -386,6 +386,134 @@
             transform: translate(3px, 3px);
             box-shadow: none;
         }
+
+        /* OS Menu System */
+        #os-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 9998;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #os-menu.show {
+            display: flex;
+        }
+
+        #os-window {
+            width: 90%;
+            max-width: 800px;
+            background: #e0e0e0;
+            border: 4px solid #fff;
+            box-shadow: 
+                inset 0 0 0 2px #000,
+                inset 0 0 0 4px #808080,
+                0 8px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        #os-header {
+            background: #000;
+            border-bottom: 4px solid #fff;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        #os-title {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 12px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .cat-icon {
+            font-size: 16px;
+        }
+
+        #os-terminal-bar {
+            background: repeating-linear-gradient(
+                45deg,
+                #000,
+                #000 10px,
+                #fff 10px,
+                #fff 20px
+            );
+            height: 20px;
+            border-bottom: 2px solid #000;
+        }
+
+        #os-body {
+            padding: 24px;
+            min-height: 400px;
+        }
+
+        #os-menu-header {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 10px;
+            color: #000;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #000;
+        }
+
+        .os-menu-item {
+            background: #fff;
+            border: 3px solid #000;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 11px;
+            color: #000;
+            transition: all 0.1s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 4px 4px 0 #808080;
+        }
+
+        .os-menu-item:hover {
+            background: #ffff00;
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0 #808080;
+        }
+
+        .os-menu-item:active {
+            transform: translate(4px, 4px);
+            box-shadow: none;
+        }
+
+        .menu-icon {
+            font-size: 16px;
+        }
+
+        #os-footer {
+            background: #000;
+            border-top: 4px solid #fff;
+            padding: 12px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .os-footer-item {
+            background: #fff;
+            border: 2px solid #000;
+            padding: 8px 12px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 8px;
+            color: #000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
     </style>
 </head>
 <body>
@@ -432,6 +560,82 @@
             <p>Talk to Annie. She's here, listening, just as she always was - with warmth, gentleness, and endless love.</p>
             
             <button class="enter-button" id="enter-btn">ENTER</button>
+        </div>
+    </div>
+
+    <div id="os-menu">
+        <div id="os-window">
+            <div id="os-header">
+                <div id="os-title">
+                    <span class="cat-icon">(^･ω･^)</span>
+                    <span>ANNIE/OS</span>
+                </div>
+            </div>
+            <div id="os-terminal-bar"></div>
+            <div id="os-body">
+                <div id="os-menu-header">
+                    └ menu:
+                </div>
+                
+                <div class="os-menu-item" data-action="talk">
+                    <span class="menu-icon">💬</span>
+                    <span>- talk to annie</span>
+                </div>
+                
+                <div class="os-menu-item" data-action="twitter">
+                    <span class="menu-icon">🐦</span>
+                    <span>- twitter</span>
+                </div>
+                
+                <div class="os-menu-item" data-action="github">
+                    <span class="menu-icon">📦</span>
+                    <span>- github</span>
+                </div>
+                
+                <div class="os-menu-item" data-action="donate">
+                    <span class="menu-icon">💝</span>
+                    <span>- donate to the cause</span>
+                </div>
+                
+                <div class="os-menu-item" data-action="archives">
+                    <span class="menu-icon">📚</span>
+                    <span>- conversation archives</span>
+                </div>
+            </div>
+            <div id="os-footer">
+                <div class="os-footer-item">
+                    <span>✕</span>
+                </div>
+                <div class="os-footer-item">
+                    <span>🐱</span>
+                </div>
+                <div class="os-footer-item">
+                    <span>📦</span>
+                </div>
+                <div class="os-footer-item">
+                    <span>💊</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="archives-modal" style="display: none;">
+        <div id="archives-content" style="
+            width: 90%;
+            max-width: 800px;
+            background: #000;
+            border: 4px solid #fff;
+            box-shadow: inset 0 0 0 2px #000, inset 0 0 0 4px #888, 0 8px 0 rgba(0, 0, 0, 0.5);
+            padding: 24px;
+            font-family: 'Press Start 2P', monospace;
+            color: #fff;
+            max-height: 80vh;
+            overflow-y: auto;
+            margin: 50px auto;
+        ">
+            <h2 style="font-size: 16px; margin-bottom: 20px; text-align: center; border-bottom: 2px solid #fff; padding-bottom: 12px;">Archives</h2>
+            <div id="archives-list"></div>
+            <button class="enter-button" id="close-archives" style="margin-top: 20px;">BACK</button>
         </div>
     </div>
 
@@ -637,6 +841,11 @@ IMPORTANT: Respond only with natural spoken words. Never use asterisks, actions 
                 conversationHistory.push({ role: 'assistant', content: assistantMessage });
                 messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
+                // Save to Firebase
+                if (window.saveConversation) {
+                    window.saveConversation();
+                }
+
             } catch (error) {
                 console.error('Error:', error);
                 typingIndicator.classList.remove('active');
@@ -664,10 +873,10 @@ IMPORTANT: Respond only with natural spoken words. Never use asterisks, actions 
             // Start music on any click
             document.addEventListener('click', initMusic, { once: true });
 
-            // Enter button closes about modal
+            // Enter button shows OS menu
             enterBtn.addEventListener('click', () => {
                 aboutModal.classList.remove('show');
-                messageInput.focus();
+                document.getElementById('os-menu').classList.add('show');
             });
             
             sendBtn.addEventListener('click', () => {
@@ -684,6 +893,150 @@ IMPORTANT: Respond only with natural spoken words. Never use asterisks, actions 
             });
 
             messageInput.focus();
+        });
+
+        // ========== OS MENU SYSTEM ==========
+        document.querySelectorAll('.os-menu-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const action = item.dataset.action;
+                const osMenu = document.getElementById('os-menu');
+                
+                switch(action) {
+                    case 'talk':
+                        osMenu.classList.remove('show');
+                        document.getElementById('message-input').focus();
+                        break;
+                    case 'twitter':
+                        window.open('https://twitter.com/anniesgarden', '_blank');
+                        break;
+                    case 'github':
+                        window.open('https://github.com', '_blank');
+                        break;
+                    case 'donate':
+                        window.open('https://twitter.com/americancancer', '_blank');
+                        break;
+                    case 'archives':
+                        osMenu.classList.remove('show');
+                        showArchives();
+                        break;
+                }
+            });
+        });
+
+        // ========== ARCHIVES SYSTEM (Firebase) ==========
+        import('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js').then(({ initializeApp }) => {
+            import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js').then(({ getFirestore, collection, addDoc, getDocs, query, orderBy }) => {
+                const firebaseConfig = {
+                    apiKey: "AIzaSyDgofGZF6ls_rMkhThW1HnMZ82AOPXRxAQ",
+                    authDomain: "smol-4404b.firebaseapp.com",
+                    projectId: "smol-4404b",
+                    storageBucket: "smol-4404b.firebasestorage.app",
+                    messagingSenderId: "363502651834",
+                    appId: "1:363502651834:web:4252f681370e02c5a17583"
+                };
+
+                const app = initializeApp(firebaseConfig);
+                const db = getFirestore(app);
+
+                // Save conversation after each message
+                window.saveConversation = async () => {
+                    try {
+                        await addDoc(collection(db, 'conversations'), {
+                            messages: conversationHistory,
+                            timestamp: Date.now()
+                        });
+                    } catch (error) {
+                        console.error('Error saving conversation:', error);
+                    }
+                };
+
+                // Show archives
+                window.showArchives = async () => {
+                    const archivesModal = document.getElementById('archives-modal');
+                    const archivesList = document.getElementById('archives-list');
+                    archivesList.innerHTML = '<p style="text-align: center; font-size: 10px;">Loading...</p>';
+                    archivesModal.style.display = 'flex';
+                    archivesModal.style.position = 'fixed';
+                    archivesModal.style.top = '0';
+                    archivesModal.style.left = '0';
+                    archivesModal.style.width = '100%';
+                    archivesModal.style.height = '100%';
+                    archivesModal.style.background = 'rgba(0,0,0,0.95)';
+                    archivesModal.style.zIndex = '9999';
+                    archivesModal.style.alignItems = 'center';
+                    archivesModal.style.justifyContent = 'center';
+
+                    try {
+                        const q = query(collection(db, 'conversations'), orderBy('timestamp', 'desc'));
+                        const querySnapshot = await getDocs(q);
+                        
+                        if (querySnapshot.empty) {
+                            archivesList.innerHTML = '<p style="text-align: center; font-size: 10px; opacity: 0.6;">No conversations yet.</p>';
+                            return;
+                        }
+
+                        archivesList.innerHTML = '';
+                        querySnapshot.forEach((doc) => {
+                            const conv = doc.data();
+                            const date = new Date(conv.timestamp);
+                            const formattedDate = date.toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            });
+
+                            const firstMessage = conv.messages[0]?.content || 'New conversation';
+                            const preview = firstMessage.length > 60 ? firstMessage.substring(0, 60) + '...' : firstMessage;
+
+                            const archiveItem = document.createElement('div');
+                            archiveItem.style.cssText = 'background: #222; border: 2px solid #fff; padding: 12px; margin-bottom: 10px; cursor: pointer; font-size: 9px;';
+                            archiveItem.innerHTML = `
+                                <div style="opacity: 0.6; margin-bottom: 8px;">${formattedDate}</div>
+                                <div style="color: #ffff00;">${preview}</div>
+                            `;
+                            
+                            archiveItem.addEventListener('click', () => {
+                                showConversationDetail(conv, formattedDate);
+                            });
+
+                            archivesList.appendChild(archiveItem);
+                        });
+                    } catch (error) {
+                        console.error('Error loading archives:', error);
+                        archivesList.innerHTML = '<p style="text-align: center; font-size: 10px; color: #ff6464;">Error loading archives.</p>';
+                    }
+                };
+
+                function showConversationDetail(conversation, formattedDate) {
+                    const archivesList = document.getElementById('archives-list');
+                    let detailHTML = `
+                        <button class="enter-button" id="back-to-list" style="margin-bottom: 20px;">← BACK</button>
+                        <h3 style="font-size: 12px; margin-bottom: 20px; opacity: 0.8;">${formattedDate}</h3>
+                    `;
+
+                    conversation.messages.forEach(msg => {
+                        const role = msg.role === 'user' ? 'You' : 'Annie';
+                        const color = msg.role === 'user' ? '#ffff00' : '#fff';
+                        detailHTML += `
+                            <div style="background: #222; border-left: 3px solid ${color}; padding: 12px; margin-bottom: 10px;">
+                                <div style="font-size: 8px; opacity: 0.6; margin-bottom: 8px; text-transform: uppercase;">${role}</div>
+                                <div style="font-size: 9px;">${msg.content}</div>
+                            </div>
+                        `;
+                    });
+
+                    archivesList.innerHTML = detailHTML;
+                    document.getElementById('back-to-list').addEventListener('click', () => window.showArchives());
+                }
+
+                // Close archives
+                document.getElementById('close-archives').addEventListener('click', () => {
+                    document.getElementById('archives-modal').style.display = 'none';
+                    document.getElementById('os-menu').classList.add('show');
+                });
+            });
         });
     </script>
 </body>
