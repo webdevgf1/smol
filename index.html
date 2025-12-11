@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Annie's Garden - ✧♡(◕‿◕✿)</title>
+    <link rel="icon" type="image/png" href="https://cdn.prod.website-files.com/69082c5061a39922df8ed3b6/693b38bedbeb66965ce7238c_New%20Project%20-%202025-12-11T213346.468.png">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         @font-face {
@@ -387,6 +388,64 @@
             box-shadow: none;
         }
 
+        /* Top Navigation Bar */
+        #top-nav {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+            gap: 10px;
+            z-index: 200;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        #top-nav.show {
+            display: flex;
+        }
+
+        .nav-btn {
+            background: #000;
+            border: 3px solid #fff;
+            color: #fff;
+            padding: 8px 16px;
+            font-size: 9px;
+            cursor: pointer;
+            font-family: 'Press Start 2P', monospace;
+            box-shadow: 3px 3px 0 #666;
+            transition: all 0.1s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn:hover {
+            background: #222;
+            transform: translate(1px, 1px);
+            box-shadow: 2px 2px 0 #666;
+        }
+
+        .nav-btn:active {
+            transform: translate(3px, 3px);
+            box-shadow: none;
+        }
+
+        .nav-btn img {
+            width: 16px;
+            height: 16px;
+        }
+
+        .nav-btn.ca-btn {
+            background: #ffff00;
+            color: #000;
+            border-color: #000;
+        }
+
+        .nav-btn.ca-btn:hover {
+            background: #ffee00;
+        }
+
         /* OS Menu System */
         #os-menu {
             position: fixed;
@@ -521,6 +580,24 @@
 <body>
     <div id="loading-screen">
         <div id="loading-text"></div>
+    </div>
+
+    <div id="top-nav">
+        <button class="nav-btn ca-btn" id="ca-btn">
+            CA: CONTRACTADDRESS
+        </button>
+        <button class="nav-btn" id="nav-twitter">
+            <img src="https://cdn.prod.website-files.com/69082c5061a39922df8ed3b6/693b35e8d731809162a985de_twitter-x-logo-png_seeklogo-492397.png" alt="X">
+        </button>
+        <button class="nav-btn" id="nav-github">
+            <img src="https://cdn.prod.website-files.com/69082c5061a39922df8ed3b6/693b35e9e6587f8011fa15aa_38401-github-logo-silhouette-in-a-square-icon-vector-icon-vector-eps.png" alt="GitHub">
+        </button>
+        <button class="nav-btn" id="nav-pump">
+            <img src="https://cdn.prod.website-files.com/69082c5061a39922df8ed3b6/69094391f6e7650d9217df8a_logo%20(4).png" alt="Pump">
+        </button>
+        <button class="nav-btn" id="nav-about">
+            ABOUT
+        </button>
     </div>
 
     <div id="canvas-container"></div>
@@ -911,6 +988,7 @@ IMPORTANT: Respond only with natural spoken words. Never use asterisks, actions 
                 switch(action) {
                     case 'talk':
                         osMenu.classList.remove('show');
+                        document.getElementById('top-nav').classList.add('show');
                         document.getElementById('message-input').focus();
                         break;
                     case 'twitter':
@@ -931,6 +1009,40 @@ IMPORTANT: Respond only with natural spoken words. Never use asterisks, actions 
                         break;
                 }
             });
+        });
+
+        // ========== TOP NAV BUTTONS ==========
+        // CA button - copy to clipboard
+        document.getElementById('ca-btn').addEventListener('click', () => {
+            const contractAddress = 'CONTRACTADDRESS'; // Replace with actual contract address
+            navigator.clipboard.writeText(contractAddress).then(() => {
+                const btn = document.getElementById('ca-btn');
+                const originalText = btn.textContent;
+                btn.textContent = 'COPIED!';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+            });
+        });
+
+        // Social buttons
+        document.getElementById('nav-twitter').addEventListener('click', () => {
+            window.open('https://twitter.com/anniesgarden', '_blank');
+        });
+
+        document.getElementById('nav-github').addEventListener('click', () => {
+            window.open('https://github.com', '_blank');
+        });
+
+        document.getElementById('nav-pump').addEventListener('click', () => {
+            window.open('https://pump.fun', '_blank');
+        });
+
+        // About button - reopens the about modal
+        document.getElementById('nav-about').addEventListener('click', () => {
+            document.getElementById('about-modal').classList.add('show');
         });
 
         // ========== ARCHIVES SYSTEM (Firebase) ==========
