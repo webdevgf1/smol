@@ -227,6 +227,19 @@
     
     <script>
         let conversationHistory = [];
+        let backgroundMusic = null;
+        let musicStarted = false;
+
+        // Initialize background music
+        function initMusic() {
+            if (!musicStarted) {
+                backgroundMusic = new Audio('music.mp3');
+                backgroundMusic.loop = true;
+                backgroundMusic.volume = 0.2; // 20% volume so her voice is clear
+                backgroundMusic.play().catch(e => console.log('Music autoplay prevented:', e));
+                musicStarted = true;
+            }
+        }
         
         // ========== 3D MODEL ==========
         function init3DModel() {
@@ -424,6 +437,9 @@ IMPORTANT: Respond only with natural spoken words. Never use asterisks, actions 
             const sendBtn = document.getElementById('send-btn');
             const messageInput = document.getElementById('message-input');
 
+            // Start music on any click
+            document.addEventListener('click', initMusic, { once: true });
+            
             sendBtn.addEventListener('click', () => {
                 const message = messageInput.value.trim();
                 if (message) sendMessage(message);
