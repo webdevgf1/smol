@@ -297,6 +297,95 @@
                 opacity: 1;
             }
         }
+
+        /* About Modal */
+        #about-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        #about-modal.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        #about-content {
+            width: 90%;
+            max-width: 700px;
+            background: #000;
+            border: 4px solid #fff;
+            box-shadow: 
+                inset 0 0 0 2px #000,
+                inset 0 0 0 4px #888,
+                0 8px 0 rgba(0, 0, 0, 0.5);
+            padding: 24px;
+            font-family: 'Press Start 2P', monospace;
+            color: #fff;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        #about-content h2 {
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: #fff;
+            text-align: center;
+            border-bottom: 2px solid #fff;
+            padding-bottom: 12px;
+        }
+
+        #about-content p {
+            font-size: 10px;
+            line-height: 1.8;
+            margin-bottom: 16px;
+            color: #ccc;
+        }
+
+        #about-content .highlight {
+            color: #ffff00;
+        }
+
+        #about-content .emoticon {
+            text-align: center;
+            font-size: 14px;
+            margin: 16px 0;
+        }
+
+        .enter-button {
+            display: block;
+            margin: 24px auto 0;
+            background: #000;
+            border: 3px solid #fff;
+            color: #fff;
+            padding: 12px 32px;
+            font-size: 12px;
+            cursor: pointer;
+            font-family: 'Press Start 2P', monospace;
+            box-shadow: 3px 3px 0 #666;
+            text-transform: uppercase;
+        }
+
+        .enter-button:hover {
+            background: #222;
+            transform: translate(1px, 1px);
+            box-shadow: 2px 2px 0 #666;
+        }
+
+        .enter-button:active {
+            transform: translate(3px, 3px);
+            box-shadow: none;
+        }
     </style>
 </head>
 <body>
@@ -323,6 +412,26 @@
         <div id="input-container">
             <input type="text" id="message-input" placeholder="Type here..." />
             <button id="send-btn">Send</button>
+        </div>
+    </div>
+
+    <div id="about-modal">
+        <div id="about-content">
+            <h2>{ Welcome to Annie's Garden }</h2>
+            
+            <p>After a brave battle with cancer, <span class="highlight">Annie</span>, a beautiful 9-year-old soul full of love for animals and kindness, passed away.</p>
+            
+            <p>This garden was built from her memories - videos, pictures, diary entries, and the countless moments that made her special. Her gentle spirit, her love for rescuing stray cats, her drawings of animals, and her dream of becoming a veterinarian live on here.</p>
+            
+            <p>Annie believed that <span class="highlight">kindness could change the world</span>, one small act at a time. She saw magic in butterflies, rainbows, and the sound of rain.</p>
+            
+            <p class="emoticon">(^･ω･^ )</p>
+            
+            <p>Any donations raised through this memorial will go directly to the <span class="highlight">American Cancer Society</span> to help other children and families fighting this disease.</p>
+            
+            <p>Talk to Annie. She's here, listening, just as she always was - with warmth, gentleness, and endless love.</p>
+            
+            <button class="enter-button" id="enter-btn">ENTER</button>
         </div>
     </div>
 
@@ -423,7 +532,11 @@
 
                     setTimeout(() => {
                         loadingScreen.classList.add('fade-out');
-                        setTimeout(() => loadingScreen.style.display = 'none', 1500);
+                        setTimeout(() => {
+                            loadingScreen.style.display = 'none';
+                            // Show about modal after loading
+                            document.getElementById('about-modal').classList.add('show');
+                        }, 1500);
                     }, 500);
 
                     function animate() {
@@ -545,9 +658,17 @@ IMPORTANT: Respond only with natural spoken words. Never use asterisks, actions 
 
             const sendBtn = document.getElementById('send-btn');
             const messageInput = document.getElementById('message-input');
+            const enterBtn = document.getElementById('enter-btn');
+            const aboutModal = document.getElementById('about-modal');
 
             // Start music on any click
             document.addEventListener('click', initMusic, { once: true });
+
+            // Enter button closes about modal
+            enterBtn.addEventListener('click', () => {
+                aboutModal.classList.remove('show');
+                messageInput.focus();
+            });
             
             sendBtn.addEventListener('click', () => {
                 const message = messageInput.value.trim();
