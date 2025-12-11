@@ -48,7 +48,7 @@ export default async function handler(req, res) {
 
         // Generate voice
         try {
-            const voicePromise = fetch('https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM', {
+            const voicePromise = fetch('https://api.elevenlabs.io/v1/text-to-speech/BL7YSL1bAkmW8U0JnU8o', {
                 method: 'POST',
                 headers: {
                     'Accept': 'audio/mpeg',
