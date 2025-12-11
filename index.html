@@ -272,6 +272,9 @@
             controls.maxPolarAngle = Math.PI / 1.5;
 
             const loader = new THREE.GLTFLoader();
+            let mixer;
+            const clock = new THREE.Clock();
+            
             loader.load(
                 'https://raw.githubusercontent.com/webdevgf1/smol/main/smol.glb',
                 function (gltf) {
@@ -288,6 +291,14 @@
                     model.position.y = -0.5;
                     scene.add(model);
 
+                    // Play the built-in animation
+                    if (gltf.animations && gltf.animations.length) {
+                        mixer = new THREE.AnimationMixer(model);
+                        gltf.animations.forEach((clip) => {
+                            mixer.clipAction(clip).play();
+                        });
+                    }
+
                     setTimeout(() => {
                         loadingScreen.classList.add('fade-out');
                         setTimeout(() => loadingScreen.style.display = 'none', 1500);
@@ -295,7 +306,8 @@
 
                     function animate() {
                         requestAnimationFrame(animate);
-                        model.rotation.y += 0.001;
+                        const delta = clock.getDelta();
+                        if (mixer) mixer.update(delta);
                         controls.update();
                         renderer.render(scene, camera);
                     }
