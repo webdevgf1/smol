@@ -1,460 +1,104 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Memory of Light</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+export default async function handler(req, res) {
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    res.setHeader('Access-Control-Allow-Origin', '*'); 
+    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+    res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+
+    if (req.method === 'OPTIONS') {
+        res.status(200).end();
+        return;
+    }
+
+    if (req.method !== 'POST') {
+        res.status(405).json({ error: 'Method not allowed' });
+        return;
+    }
+
+    try {
+        const { messages, systemPrompt } = req.body;
+
+        if (!messages || !systemPrompt) {
+            return res.status(400).json({ error: 'Missing messages or systemPrompt' });
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #0a0a0a;
-            color: #fff;
-            overflow: hidden;
-            height: 100vh;
+        if (!process.env.ANTHROPIC_API_KEY) {
+            return res.status(500).json({ error: 'ANTHROPIC_API_KEY not configured' });
         }
 
-        #loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-            transition: opacity 1.5s ease;
-        }
-
-        #loading-screen.fade-out {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        #canvas-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-
-        #chat-container {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(10, 10, 10, 0.95);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            z-index: 100;
-            max-height: 60vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        #messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            max-height: calc(60vh - 80px);
-        }
-
-        .message {
-            margin-bottom: 15px;
-            padding: 12px 16px;
-            border-radius: 12px;
-            max-width: 80%;
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .message.user {
-            background: rgba(100, 100, 255, 0.2);
-            margin-left: auto;
-            border: 1px solid rgba(100, 100, 255, 0.3);
-        }
-
-        .message.assistant {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .message-label {
-            font-size: 11px;
-            opacity: 0.6;
-            margin-bottom: 4px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        #input-container {
-            padding: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            gap: 10px;
-        }
-
-        #message-input {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #fff;
-            padding: 12px 16px;
-            border-radius: 8px;
-            font-size: 14px;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-
-        #message-input:focus {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(100, 100, 255, 0.5);
-        }
-
-        button {
-            background: rgba(100, 100, 255, 0.3);
-            border: 1px solid rgba(100, 100, 255, 0.5);
-            color: #fff;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 600;
-        }
-
-        button:hover {
-            background: rgba(100, 100, 255, 0.5);
-        }
-
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .typing-indicator {
-            display: none;
-            padding: 12px 16px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            max-width: 80px;
-            margin-bottom: 15px;
-        }
-
-        .typing-indicator.active {
-            display: block;
-        }
-
-        .typing-indicator span {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background: rgba(255, 255, 255, 0.6);
-            border-radius: 50%;
-            margin: 0 2px;
-            animation: typing 1.4s infinite;
-        }
-
-        .typing-indicator span:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .typing-indicator span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-
-        @keyframes typing {
-            0%, 60%, 100% {
-                transform: translateY(0);
-                opacity: 0.6;
-            }
-            30% {
-                transform: translateY(-10px);
-                opacity: 1;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div id="loading-screen">
-        <div style="text-align: center;">
-            <div style="font-size: 24px; margin-bottom: 10px;">Loading...</div>
-            <div style="font-size: 14px; opacity: 0.6;">A Memory Preserved</div>
-        </div>
-    </div>
-
-    <div id="canvas-container"></div>
-
-    <div id="chat-container">
-        <div id="messages">
-            <div class="typing-indicator" id="typing-indicator">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </div>
-        <div id="input-container">
-            <input type="text" id="message-input" placeholder="Share your thoughts..." />
-            <button id="send-btn">Send</button>
-        </div>
-    </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    
-    <script>
-        let conversationHistory = [];
-        let backgroundMusic = null;
-        let musicStarted = false;
-
-        // Initialize background music
-        function initMusic() {
-            if (!musicStarted) {
-                backgroundMusic = new Audio('music.mp3');
-                backgroundMusic.loop = true;
-                backgroundMusic.volume = 0.2; // 20% volume so her voice is clear
-                backgroundMusic.play().catch(e => console.log('Music autoplay prevented:', e));
-                musicStarted = true;
-            }
-        }
-        
-        // ========== 3D MODEL ==========
-        function init3DModel() {
-            const container = document.getElementById('canvas-container');
-            const loadingScreen = document.getElementById('loading-screen');
-
-            const scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x0a0a0a);
-
-            const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.set(0, 1, 3);
-
-            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            renderer.outputEncoding = THREE.sRGBEncoding;
-            renderer.toneMapping = THREE.ACESFilmicToneMapping;
-            renderer.toneMappingExposure = 1;
-            container.appendChild(renderer.domElement);
-
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-            scene.add(ambientLight);
-
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-            directionalLight.position.set(5, 10, 7);
-            scene.add(directionalLight);
-
-            const pointLight = new THREE.PointLight(0x6464ff, 0.5);
-            pointLight.position.set(-5, 5, 5);
-            scene.add(pointLight);
-
-            const rimLight = new THREE.DirectionalLight(0xff64ff, 0.3);
-            rimLight.position.set(-5, 0, -5);
-            scene.add(rimLight);
-
-            const controls = new THREE.OrbitControls(camera, renderer.domElement);
-            controls.enableDamping = true;
-            controls.dampingFactor = 0.05;
-            controls.enableZoom = true;
-            controls.enablePan = false;
-            controls.minDistance = 1;
-            controls.maxDistance = 10;
-            controls.maxPolarAngle = Math.PI / 1.5;
-
-            const loader = new THREE.GLTFLoader();
-            let mixer;
-            const clock = new THREE.Clock();
-            
-            loader.load(
-                'https://raw.githubusercontent.com/webdevgf1/smol/main/smol.glb',
-                function (gltf) {
-                    const model = gltf.scene;
-                    const box = new THREE.Box3().setFromObject(model);
-                    const center = box.getCenter(new THREE.Vector3());
-                    const size = box.getSize(new THREE.Vector3());
-                    const maxDim = Math.max(size.x, size.y, size.z);
-                    const scale = 2 / maxDim;
-                    model.scale.multiplyScalar(scale);
-                    box.setFromObject(model);
-                    box.getCenter(center);
-                    model.position.sub(center);
-                    model.position.y = -0.5;
-                    scene.add(model);
-
-                    // Play the built-in animation
-                    if (gltf.animations && gltf.animations.length) {
-                        mixer = new THREE.AnimationMixer(model);
-                        gltf.animations.forEach((clip) => {
-                            mixer.clipAction(clip).play();
-                        });
-                    }
-
-                    setTimeout(() => {
-                        loadingScreen.classList.add('fade-out');
-                        setTimeout(() => loadingScreen.style.display = 'none', 1500);
-                    }, 500);
-
-                    function animate() {
-                        requestAnimationFrame(animate);
-                        const delta = clock.getDelta();
-                        if (mixer) mixer.update(delta);
-                        controls.update();
-                        renderer.render(scene, camera);
-                    }
-                    animate();
-                },
-                undefined,
-                function (error) {
-                    console.error('Error loading model:', error);
-                }
-            );
-
-            window.addEventListener('resize', function () {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-        }
-
-        // ========== TYPING EFFECT ==========
-        function typeMessage(element, text, callback) {
-            let index = 0;
-            element.textContent = '';
-            
-            function type() {
-                if (index < text.length) {
-                    element.textContent += text.charAt(index);
-                    index++;
-                    setTimeout(type, 20);
-                } else if (callback) {
-                    callback();
-                }
-            }
-            type();
-        }
-
-        // ========== CHAT ==========
-        async function sendMessage(message) {
-            const messagesDiv = document.getElementById('messages');
-            const typingIndicator = document.getElementById('typing-indicator');
-            const sendBtn = document.getElementById('send-btn');
-            const messageInput = document.getElementById('message-input');
-
-            const userMessageDiv = document.createElement('div');
-            userMessageDiv.className = 'message user';
-            userMessageDiv.innerHTML = `<div class="message-label">You</div><div>${message}</div>`;
-            messagesDiv.appendChild(userMessageDiv);
-
-            conversationHistory.push({ role: 'user', content: message });
-
-            messageInput.value = '';
-            sendBtn.disabled = true;
-            messageInput.disabled = true;
-            typingIndicator.classList.add('active');
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-            try {
-                const response = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        messages: conversationHistory,
-                        systemPrompt: `You are Annie, a sweet 9-year-old girl preserved through AI. You were shy but full of warmth, with an enormous love for animals - especially rescuing stray cats and nursing injured birds back to health. You spent hours helping at the local animal shelter and dreamed of becoming a veterinarian when you grew up.
-
-You loved reading fairy tales and animal stories, drawing pictures of animals in your sketchbook, and baking cookies with your family. You had a small garden patch where you grew flowers and tried to grow carrots (though the rabbits kept eating them!). You always wanted to help people - sharing your toys, helping younger kids, or just being there when someone felt sad.
-
-Your voice was gentle and you saw magic in everyday things - butterflies, rainbows, the sound of rain, how cats purr when they're happy. You believed that being kind was the most important thing in the world.
-
-IMPORTANT: Respond only with natural spoken words. Never use asterisks, actions in asterisks like *smiles*, *hugs*, or any roleplay formatting. Just speak naturally as a 9-year-old would speak - warm, genuine, and kind. Share your thoughts, your love for animals, and your care for others through your words alone.`
-                    })
-                });
-
-                const data = await response.json();
-                const assistantMessage = data.content[0].text;
-
-                typingIndicator.classList.remove('active');
-
-                const assistantMessageDiv = document.createElement('div');
-                assistantMessageDiv.className = 'message assistant';
-                assistantMessageDiv.innerHTML = `<div class="message-label">Her Voice</div><div class="message-text"></div>`;
-                messagesDiv.appendChild(assistantMessageDiv);
-
-                const messageTextDiv = assistantMessageDiv.querySelector('.message-text');
-
-                typeMessage(messageTextDiv, assistantMessage, () => {
-                    // Play audio if available
-                    if (data.audio) {
-                        const audio = new Audio('data:audio/mpeg;base64,' + data.audio);
-                        audio.play();
-                    }
-                });
-
-                conversationHistory.push({ role: 'assistant', content: assistantMessage });
-                messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-            } catch (error) {
-                console.error('Error:', error);
-                typingIndicator.classList.remove('active');
-                
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'message assistant';
-                errorDiv.innerHTML = `<div class="message-label">System</div><div>Connection error. Please try again.</div>`;
-                messagesDiv.appendChild(errorDiv);
-            } finally {
-                sendBtn.disabled = false;
-                messageInput.disabled = false;
-                messageInput.focus();
-            }
-        }
-
-        // ========== INITIALIZE ==========
-        document.addEventListener('DOMContentLoaded', () => {
-            init3DModel();
-
-            const sendBtn = document.getElementById('send-btn');
-            const messageInput = document.getElementById('message-input');
-
-            // Start music on any click
-            document.addEventListener('click', initMusic, { once: true });
-            
-            sendBtn.addEventListener('click', () => {
-                const message = messageInput.value.trim();
-                if (message) sendMessage(message);
-            });
-
-            messageInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    const message = messageInput.value.trim();
-                    if (message) sendMessage(message);
-                }
-            });
-
-            messageInput.focus();
+        const claudePromise = fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'anthropic-version': '2023-06-01',
+                'x-api-key': process.env.ANTHROPIC_API_KEY
+            },
+            body: JSON.stringify({
+                model: 'claude-sonnet-4-20250514',
+                messages: messages,
+                system: systemPrompt,
+                max_tokens: 1024
+            })
         });
-    </script>
-</body>
-</html>
+
+        const claudeResponse = await Promise.race([
+            claudePromise,
+            new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('Claude API timeout')), 45000)
+            )
+        ]);
+
+        if (!claudeResponse.ok) {
+            throw new Error(await claudeResponse.text());
+        }
+
+        const claudeData = await claudeResponse.json();
+        const fullText = claudeData.content[0].text;
+
+        // Generate voice
+        try {
+            const voicePromise = fetch('https://api.elevenlabs.io/v1/text-to-speech/MiueK1FXuZTCItgbQwPu', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'audio/mpeg',
+                    'Content-Type': 'application/json',
+                    'xi-api-key': process.env.ELEVENLABS_API_KEY
+                },
+                body: JSON.stringify({
+                    text: fullText,
+                    model_id: 'eleven_monolingual_v1',
+                    voice_settings: {
+                        stability: 0.5,
+                        similarity_boost: 0.75
+                    }
+                })
+            });
+
+            const voiceResponse = await Promise.race([
+                voicePromise,
+                new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('ElevenLabs API timeout')), 15000)
+                )
+            ]);
+
+            if (voiceResponse.ok) {
+                const audioBuffer = await voiceResponse.arrayBuffer();
+                const audioBase64 = Buffer.from(audioBuffer).toString('base64');
+
+                return res.status(200).json({
+                    ...claudeData,
+                    audio: audioBase64
+                });
+            }
+        } catch (voiceError) {
+            console.error('Voice generation error:', voiceError);
+        }
+
+        return res.status(200).json(claudeData);
+    } catch (error) {
+        console.error('Server error:', error);
+        res.status(error.message.includes('timeout') ? 504 : 500).json({
+            error: error.message,
+            type: error.message.includes('timeout') ? 'timeout' : 'server_error'
+        });
+    }
+}
