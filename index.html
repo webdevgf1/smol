@@ -584,7 +584,7 @@
 
     <div id="top-nav">
         <button class="nav-btn ca-btn" id="ca-btn">
-            CA: CONTRACTADDRESS
+            CA: FBPzxp7BTrMRq3qiZ7UYgfoLpZxb4un62DNoMsf5pump
         </button>
         <button class="nav-btn" id="nav-twitter">
             <img src="https://cdn.prod.website-files.com/69082c5061a39922df8ed3b6/693b3a09b7a72f965e7c7747_twitter-x-logo-png_seeklogo-492397%20(1).png" alt="X">
@@ -1001,7 +1001,7 @@ IMPORTANT: Respond only with natural spoken words. Never use asterisks, actions 
                         window.open('https://twitter.com/americancancer', '_blank');
                         break;
                     case 'pump':
-                        window.open('https://pump.fun', '_blank');
+                        window.open('https://pump.fun/coin/FBPzxp7BTrMRq3qiZ7UYgfoLpZxb4un62DNoMsf5pump', '_blank');
                         break;
                     case 'archives':
                         osMenu.classList.remove('show');
@@ -1014,7 +1014,7 @@ IMPORTANT: Respond only with natural spoken words. Never use asterisks, actions 
         // ========== TOP NAV BUTTONS ==========
         // CA button - copy to clipboard
         document.getElementById('ca-btn').addEventListener('click', () => {
-            const contractAddress = 'CONTRACTADDRESS'; // Replace with actual contract address
+            const contractAddress = 'FBPzxp7BTrMRq3qiZ7UYgfoLpZxb4un62DNoMsf5pump'; // Replace with actual contract address
             navigator.clipboard.writeText(contractAddress).then(() => {
                 const btn = document.getElementById('ca-btn');
                 const originalText = btn.textContent;
@@ -1037,7 +1037,7 @@ IMPORTANT: Respond only with natural spoken words. Never use asterisks, actions 
         });
 
         document.getElementById('nav-pump').addEventListener('click', () => {
-            window.open('https://pump.fun', '_blank');
+            window.open('https://pump.fun/coin/FBPzxp7BTrMRq3qiZ7UYgfoLpZxb4un62DNoMsf5pump', '_blank');
         });
 
         // About button - reopens the about modal
