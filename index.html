@@ -492,7 +492,9 @@
         }
 
         .menu-icon {
-            font-size: 16px;
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
         }
 
         #os-footer {
@@ -583,18 +585,23 @@
                 </div>
                 
                 <div class="os-menu-item" data-action="twitter">
-                    <span class="menu-icon">🐦</span>
+                    <img class="menu-icon" src="https://cdn.prod.website-files.com/69082c5061a39922df8ed3b6/693b35e8d731809162a985de_twitter-x-logo-png_seeklogo-492397.png" alt="X">
                     <span>- twitter</span>
                 </div>
                 
                 <div class="os-menu-item" data-action="github">
-                    <span class="menu-icon">📦</span>
+                    <img class="menu-icon" src="https://cdn.prod.website-files.com/69082c5061a39922df8ed3b6/693b35e9e6587f8011fa15aa_38401-github-logo-silhouette-in-a-square-icon-vector-icon-vector-eps.png" alt="GitHub">
                     <span>- github</span>
                 </div>
                 
                 <div class="os-menu-item" data-action="donate">
                     <span class="menu-icon">💝</span>
                     <span>- donate to the cause</span>
+                </div>
+
+                <div class="os-menu-item" data-action="pump">
+                    <img class="menu-icon" src="https://cdn.prod.website-files.com/69082c5061a39922df8ed3b6/69094391f6e7650d9217df8a_logo%20(4).png" alt="Pump">
+                    <span>- pump.fun</span>
                 </div>
                 
                 <div class="os-menu-item" data-action="archives">
@@ -914,6 +921,9 @@ IMPORTANT: Respond only with natural spoken words. Never use asterisks, actions 
                         break;
                     case 'donate':
                         window.open('https://twitter.com/americancancer', '_blank');
+                        break;
+                    case 'pump':
+                        window.open('https://pump.fun', '_blank');
                         break;
                     case 'archives':
                         osMenu.classList.remove('show');
