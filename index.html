@@ -6,6 +6,13 @@
     <title>Memory of Light</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
+        @font-face {
+            font-family: 'Geist';
+            src: url('geist.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -28,6 +35,7 @@
             height: 100%;
             background: #000;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 10000;
@@ -37,6 +45,32 @@
         #loading-screen.fade-out {
             opacity: 0;
             pointer-events: none;
+        }
+
+        #loading-image {
+            width: 300px;
+            height: auto;
+            margin-bottom: 40px;
+        }
+
+        #loading-text {
+            font-family: 'Geist', 'Segoe UI', sans-serif;
+            font-size: 24px;
+            color: #fff;
+            letter-spacing: 2px;
+        }
+
+        @keyframes loadingDots {
+            0% { content: 'Loading'; }
+            25% { content: 'Loading.'; }
+            50% { content: 'Loading..'; }
+            75% { content: 'Loading...'; }
+            100% { content: 'Loading'; }
+        }
+
+        #loading-text::after {
+            content: 'Loading';
+            animation: loadingDots 1.5s infinite;
         }
 
         #canvas-container {
@@ -269,10 +303,8 @@
 </head>
 <body>
     <div id="loading-screen">
-        <div style="text-align: center;">
-            <div style="font-size: 24px; margin-bottom: 10px;">Loading...</div>
-            <div style="font-size: 14px; opacity: 0.6;">A Memory Preserved</div>
-        </div>
+        <img id="loading-image" src="https://cdn.prod.website-files.com/69082c5061a39922df8ed3b6/693b31594ce0e466fae45d77_New%20Project%20-%202025-12-11T210210.071.png" alt="Annie">
+        <div id="loading-text"></div>
     </div>
 
     <div id="canvas-container"></div>
